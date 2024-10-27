@@ -33,6 +33,8 @@
         <p>Your current balance is:</p>
         <p class="balance" id="balance">Loading...</p>
         <button id="logoutButton">Logout</button> <!-- Logout Button -->
+        <button class="transaction-button" onclick="goToTransaction()">Transfer Money</button>
+
     </div>
 
     <script>
@@ -60,7 +62,12 @@
 
             // Redirect to the login page
             window.location.href = '/login.html'; // Change to your login page URL
+
+            
         });
+        function goToTransaction() {
+            window.location.href = 'Transaction.html'; // Redirect to transaction page
+        }
     </script>
 </body>
 </html>

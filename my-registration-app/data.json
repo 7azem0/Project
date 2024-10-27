@@ -1,75 +1,17 @@
 {
   "users": [
     {
-      "firstName": "333",
-      "middleName": "333",
-      "lastName": "333",
-      "email": "333@gmail.com",
-      "phone": "11111111",
-      "dob": "2024-10-02",
-      "address": "1111",
-      "ssn": "2023030060",
-      "accountType": "business",
-      "password": "1111",
-      "securityQuestion": "q1",
-      "securityAnswer": "111"
-    },
-    {
-      "firstName": "Hm",
-      "middleName": "hmm",
-      "lastName": "mhh",
-      "email": "123@gmail.com",
-      "phone": "01013195560",
-      "dob": "2024-10-02",
-      "address": "1234567",
-      "ssn": "2023030060",
-      "accountType": "individual",
-      "password": "12345",
-      "securityQuestion": "q3",
-      "securityAnswer": "Mohamed sayed"
-    },
-    {
-      "firstName": "123",
-      "middleName": "321",
-      "lastName": "123",
-      "email": "321@gmail.com",
-      "phone": "01013195560",
-      "dob": "2024-10-23",
-      "address": "123456789",
-      "ssn": "2023030060",
-      "accountType": "individual",
-      "password": "321",
-      "securityQuestion": "q1",
-      "securityAnswer": "Mohamed sayed"
-    },
-    {
       "firstName": "Hazem",
-      "middleName": "Hassan",
       "lastName": "Alyan‬‏",
-      "email": "123@gmail.co",
-      "phone": "1234",
-      "dob": "2024-10-09",
-      "address": "33 محيي الدين ابو العز",
-      "ssn": "2023030060",
-      "accountType": "individual",
-      "password": "123",
-      "securityQuestion": "q1",
-      "securityAnswer": "Mohamed sayed"
-    },
-    {
-      "firstName": "‪7azem",
-      "middleName": "Hassan",
-      "lastName": "Hassan‬‏",
-      "email": "7azassan@gmail.com",
-      "phone": "123",
+      "email": "7asan@gmail.com",
+      "phone": "2222222222",
       "dob": "2024-10-03",
-      "address": "33 محيي الدين ابو العز",
+      "address": "12345",
       "ssn": "2023030060",
-      "accountType": "individual",
-      "password": "000",
-      "securityQuestion": "q1",
-      "securityAnswer": "Mohamed sayed"
+      "password": "Psk1234567",
+      "securityQuestion": "q2",
+      "securityAnswer": "Mohamed sayed",
+      "balance": 1000
     }
-    
   ]
 }

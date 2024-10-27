@@ -60,7 +60,8 @@ document.getElementById('registrationForm').addEventListener('submit', function(
         ssn,
         password,
         securityQuestion,
-        securityAnswer
+        securityAnswer,
+        balance:1000
     };
 
     // Send data to server
