@@ -1,91 +1,18 @@
 {
   "users": [
     {
-      "name": "wiener",
-      "email": "66@gmail.com",
-      "password": "hhh"
-    },
-    {
-      "fullName": "wiener",
-      "email": "55@gmail.com",
-      "phone": "01013195560",
-      "dob": "2024-10-16",
-      "address": "33 محيي الدين ابو العز",
+      "firstName": "333",
+      "middleName": "333",
+      "lastName": "333",
+      "email": "333@gmail.com",
+      "phone": "11111111",
+      "dob": "2024-10-02",
+      "address": "1111",
       "ssn": "2023030060",
-      "accountType": "individual",
-      "password": "55",
-      "securityQuestion": "q2",
-      "securityAnswer": "Mohamed sayed"
-    },
-    {
-      "firstName": "‪7azem",
-      "middleName": "Hassan",
-      "lastName": "Hassan‬‏",
-      "email": "7an@gmail.com",
-      "phone": "01013195560",
-      "dob": "2024-10-16",
-      "address": "33 محيي الدين ابو العز",
-      "ssn": "2023030060",
-      "accountType": "individual",
-      "password": "111",
-      "securityQuestion": "q2",
-      "securityAnswer": "Mohamed sayed"
-    },
-    {
-      "firstName": "hhh",
-      "middleName": "yyy",
-      "lastName": "rrr",
-      "email": "12@gmail.com",
-      "phone": "01013195560",
-      "dob": "2024-10-17",
-      "address": "Cairo",
-      "ssn": "2023030060",
-      "accountType": "individual",
-      "password": "123",
-      "securityQuestion": "q2",
-      "securityAnswer": "Mohamed sayed"
-    },
-    {
-      "firstName": "yyy",
-      "middleName": "uuu",
-      "lastName": "rrr",
-      "email": "1234@gmail.com",
-      "phone": "01013195560",
-      "dob": "2024-10-17",
-      "address": "Cairo",
-      "ssn": "2023030060",
-      "accountType": "individual",
-      "password": "222",
-      "securityQuestion": "q2",
-      "securityAnswer": "Mohamed sayed"
-    },
-    {
-      "firstName": "hyy",
-      "middleName": "uuu",
-      "lastName": "rrr",
-      "email": "12356@gmail.com",
-      "phone": "01013195560",
-      "dob": "2024-10-17",
-      "address": "Cairo",
-      "ssn": "2023030060",
-      "accountType": "individual",
-      "password": "656",
-      "securityQuestion": "q2",
-      "securityAnswer": "Mohamed sayed"
-    },
-    {
-      "firstName": "tyt",
-      "middleName": "ddd",
-      "lastName": "hgf",
-      "email": "43fv@gmail.com",
-      "phone": "01013195560",
-      "dob": "2024-10-17",
-      "address": "Cairo",
-      "ssn": "2023030060",
-      "accountType": "individual",
-      "password": "111",
-      "securityQuestion": "q2",
-      "securityAnswer": "Mohamed sayed"
+      "accountType": "business",
+      "password": "1111",
+      "securityQuestion": "q1",
+      "securityAnswer": "111"
     }
   ]
 }

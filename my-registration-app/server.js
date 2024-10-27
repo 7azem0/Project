@@ -69,9 +69,7 @@ app.post('/register', (req, res) => {
                 return res.status(500).json({ message: 'Error writing to data.json' });
             }
             console.log('User registered successfully:', newUser.email);
-            res.status(200).json({ message: 'Registration successful!' ,
-                "success" : true
-            });
+            res.status(200).json({ message: 'Registration successful!' , success: true });
         });
     });
 });

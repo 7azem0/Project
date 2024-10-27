@@ -52,9 +52,7 @@ document.getElementById('registrationForm').addEventListener('submit', function(
 
             // If registration is successful, redirect to login page
             if (data.success) {
-                setTimeout(() => {
-                    window.location.href = '/login.html';  // Redirect to the login page after 1.5 seconds
-                }, 500);  // .5 seconds delay
+                window.location.href = '/login.html';  
             }
         }
     })
