@@ -75,14 +75,12 @@ app.post('/register', (req, res) => {
 });
 
 // Login route
+// Login route
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
 
-    console.log('Login attempt for:', email); // Log login attempt
-
     fs.readFile(path.join(__dirname, 'data.json'), 'utf8', (err, data) => {
         if (err) {
-            console.error('Error reading data.json:', err);
             return res.status(500).json({ message: 'Error fetching user data. Try again later.' });
         }
 
@@ -90,7 +88,6 @@ app.post('/login', (req, res) => {
         try {
             jsonData = JSON.parse(data);
         } catch (parseError) {
-            console.error('Error parsing data.json:', parseError);
             return res.status(500).json({ message: 'Error fetching user data. Try again later.' });
         }
 
@@ -98,19 +95,19 @@ app.post('/login', (req, res) => {
         const user = users.find(user => user.email === email);
 
         if (!user) {
-            console.log('User not found:', email);
             return res.status(400).json({ message: 'User not found. Please register.' });
         }
 
         if (user.password !== password) {
-            console.log('Password mismatch for user:', email);
             return res.status(400).json({ message: 'Incorrect password. Please try again.' });
         }
 
-        console.log('Login successful for user:', email);
-        return res.status(200).json({ message: 'Login successful!' });
+        // Redirect to home page with default balance of 1000
+        const userBalance = 1000;  // Default balance
+        return res.redirect(`/home.html?balance=${userBalance}`);
     });
 });
+
 
 // Serve static files like the registration and login pages
 app.use(express.static(path.join(__dirname, 'public')));
