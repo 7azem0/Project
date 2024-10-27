@@ -41,6 +41,35 @@
       "password": "321",
       "securityQuestion": "q1",
       "securityAnswer": "Mohamed sayed"
+    },
+    {
+      "firstName": "Hazem",
+      "middleName": "Hassan",
+      "lastName": "Alyan‬‏",
+      "email": "123@gmail.co",
+      "phone": "1234",
+      "dob": "2024-10-09",
+      "address": "33 محيي الدين ابو العز",
+      "ssn": "2023030060",
+      "accountType": "individual",
+      "password": "123",
+      "securityQuestion": "q1",
+      "securityAnswer": "Mohamed sayed"
+    },
+    {
+      "firstName": "‪7azem",
+      "middleName": "Hassan",
+      "lastName": "Hassan‬‏",
+      "email": "7azassan@gmail.com",
+      "phone": "123",
+      "dob": "2024-10-03",
+      "address": "33 محيي الدين ابو العز",
+      "ssn": "2023030060",
+      "accountType": "individual",
+      "password": "000",
+      "securityQuestion": "q1",
+      "securityAnswer": "Mohamed sayed"
     }
+    
   ]
 }

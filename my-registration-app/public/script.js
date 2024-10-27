@@ -14,10 +14,37 @@ document.getElementById('registrationForm').addEventListener('submit', function(
     const securityAnswer = document.getElementById('securityAnswer').value.trim();
 
     const message = document.getElementById('message');
-    
+    message.innerHTML = ''; // Clear previous messages
+
+    // Validation patterns
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phonePattern = /^[0-9]{10}$/;  // Assuming 10-digit phone number
+    const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;  // Minimum 8 characters, at least 1 letter and 1 number
+
     // Form validation
     if (!firstName || !lastName || !email || !phone || !dob || !address || !ssn || !password || !securityQuestion || !securityAnswer) {
         message.innerHTML = "All fields are required.";
+        message.style.color = 'red';
+        return;
+    }
+
+    // Email validation
+    if (!emailPattern.test(email)) {
+        message.innerHTML = "Please enter a valid email address.";
+        message.style.color = 'red';
+        return;
+    }
+
+    // Phone validation
+    if (!phonePattern.test(phone)) {
+        message.innerHTML = "Please enter a valid 10-digit phone number.";
+        message.style.color = 'red';
+        return;
+    }
+
+    // Password validation
+    if (!passwordPattern.test(password)) {
+        message.innerHTML = "Password must be at least 8 characters long and contain at least one letter and one number.";
         message.style.color = 'red';
         return;
     }
@@ -52,7 +79,9 @@ document.getElementById('registrationForm').addEventListener('submit', function(
 
             // If registration is successful, redirect to login page
             if (data.success) {
-                window.location.href = '/login.html';  
+                setTimeout(() => {
+                    window.location.href = '/login.html';  
+                }, 2000);  // Delay to show success message before redirect
             }
         }
     })
