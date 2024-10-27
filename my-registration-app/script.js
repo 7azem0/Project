@@ -49,6 +49,13 @@ document.getElementById('registrationForm').addEventListener('submit', function(
         if (data.message) {
             message.innerHTML = data.message;
             message.style.color = data.success ? 'green' : 'red';
+
+            // If registration is successful, redirect to login page
+            if (data.success) {
+                setTimeout(() => {
+                    window.location.href = '/login.html';  // Redirect to the login page after 1.5 seconds
+                }, 500);  // .5 seconds delay
+            }
         }
     })
     .catch(error => {
