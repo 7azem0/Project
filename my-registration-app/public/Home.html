@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Home</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            text-align: center;
+            padding-top: 50px;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+        }
+        h1 {
+            color: #333;
+        }
+        .balance {
+            font-size: 2em;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="welcomeMessage">Welcome to your account</h1>
+        <p>Your current balance is:</p>
+        <p class="balance" id="balance">Loading...</p>
+        <button id="logoutButton">Logout</button> <!-- Logout Button -->
+    </div>
+
+    <script>
+        // Function to display the home page
+        function displayHomePage(firstName, lastName, balance) {
+            document.getElementById("welcomeMessage").innerText = `Welcome, ${firstName} ${lastName}!`;
+            document.getElementById('balance').textContent = `$${balance}`;
+        }
+
+        // Retrieve first name, last name, and balance from localStorage
+        const firstName = localStorage.getItem('firstName') || 'Guest';
+        const lastName = localStorage.getItem('lastName') || '';
+        const balance = localStorage.getItem('balance') || '0';
+
+        // Call the display function
+        displayHomePage(firstName, lastName, balance);
+
+        // Logout function
+        document.getElementById('logoutButton').addEventListener('click', function () {
+            // Clear first name, last name, and balance from localStorage
+            localStorage.removeItem('firstName');
+            localStorage.removeItem('lastName');
+            localStorage.removeItem('balance');
+
+
+            // Redirect to the login page
+            window.location.href = '/login.html'; // Change to your login page URL
+        });
+    </script>
+</body>
+</html>
