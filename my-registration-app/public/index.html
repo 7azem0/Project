@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <title>Register to Online Banking</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Create your account</h1>
+        <form id="registrationForm">
+            <div class="form-grid"> <!-- 2-column layout -->
+                <div class="input-group">
+                    <input type="text" id="firstName" name="firstName" placeholder="First Name" required>
+                    <span class="input-focus-border"></span>
+                </div>
+
+                <div class="input-group">
+                    <input type="text" id="middleName" name="middleName" placeholder="Middle Name">
+                    <span class="input-focus-border"></span>
+                </div>
+
+                <div class="input-group">
+                    <input type="text" id="lastName" name="lastName" placeholder="Last Name" required>
+                    <span class="input-focus-border"></span>
+                </div>
+
+                <div class="input-group">
+                    <input type="email" id="email" name="email" placeholder="Email" required>
+                    <span class="input-focus-border"></span>
+                </div>
+
+                <div class="input-group">
+                    <input type="tel" id="phone" name="phone" placeholder="Phone Number" required>
+                    <span class="input-focus-border"></span>
+                </div>
+
+                <div class="input-group">
+                    <input type="date" id="dob" name="dob" placeholder="Date of Birth" required>
+                    <span class="input-focus-border"></span>
+                </div>
+
+                <div class="input-group">
+                    <input type="text" id="address" name="address" placeholder="Address" required>
+                    <span class="input-focus-border"></span>
+                </div>
+
+                <div class="input-group">
+                    <input type="text" id="ssn" name="ssn" placeholder="SSN/Government ID" required>
+                    <span class="input-focus-border"></span>
+                </div>
+
+                <div class="input-group">
+                    <select id="accountType" name="accountType" required>
+                        <option value="">Select Account Type</option>
+                        <option value="individual">Individual</option>
+                        <option value="business">Business</option>
+                    </select>
+                    <span class="input-focus-border"></span>
+                </div>
+
+                <div class="input-group">
+                    <input type="password" id="password" name="password" placeholder="Password" required>
+                    <span class="input-focus-border"></span>
+                </div>
+
+                <div class="input-group">
+                    <select id="securityQuestion" name="securityQuestion" required>
+                        <option value="">Select Security Question</option>
+                        <option value="q1">What is your mother's maiden name?</option>
+                        <option value="q2">What is your first pet's name?</option>
+                        <option value="q3">What was the name of your elementary school?</option>
+                    </select>
+                    <span class="input-focus-border"></span>
+                </div>
+
+                <div class="input-group">
+                    <input type="text" id="securityAnswer" name="securityAnswer" placeholder="Answer" required>
+                    <span class="input-focus-border"></span>
+                </div>
+            </div> <!-- End form-grid -->
+
+            <button type="submit">Register</button>
+        </form>
+        <p id="message"></p>
+        <p>Already have an account? <a href="login.html">Login here</a></p>
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>

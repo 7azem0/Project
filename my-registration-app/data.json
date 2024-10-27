@@ -1,0 +1,21 @@
+{
+  "users": [
+    {
+      "name": "wiener",
+      "email": "66@gmail.com",
+      "password": "hhh"
+    },
+    {
+      "fullName": "wiener",
+      "email": "55@gmail.com",
+      "phone": "01013195560",
+      "dob": "2024-10-16",
+      "address": "33 محيي الدين ابو العز",
+      "ssn": "2023030060",
+      "accountType": "individual",
+      "password": "55",
+      "securityQuestion": "q2",
+      "securityAnswer": "Mohamed sayed"
+    }
+  ]
+}
