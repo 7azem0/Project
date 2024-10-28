@@ -113,6 +113,7 @@ app.post('/login', (req, res) => {
 // Transfer funds route
 app.post('/transfer', (req, res) => {
     const { senderEmail, recipientGovID, amount } = req.body;
+    console.log('Transfer amount:', amount);
 
     if (!senderEmail || !recipientGovID || !amount || isNaN(amount) || amount <= 0) {
         return res.status(400).json({ success: false, message: "Invalid input data." });
@@ -130,6 +131,8 @@ app.post('/transfer', (req, res) => {
 
         const sender = senderResults[0];
 
+        
+
         db.query('SELECT * FROM users WHERE ssn = ?', [recipientGovID], (error, recipientResults) => {
             if (error) {
                 return res.status(500).json({ message: 'Error fetching user data. Try again later.' });
@@ -141,13 +144,18 @@ app.post('/transfer', (req, res) => {
 
             const recipient = recipientResults[0];
 
+            console.log('Recipient initial balance:', recipient.balance);
+
+
             if (sender.balance < amount) {
                 return res.status(400).json({ success: false, message: "Insufficient balance." });
             }
 
             // Perform the transaction
             const updatedSenderBalance = Math.round((sender.balance - amount) * 100) / 100;
-            const updatedRecipientBalance = Math.round((recipient.balance + amount) * 100) / 100;
+            const updatedRecipientBalance = parseFloat(recipient.balance) + parseFloat(amount);
+
+
 
             // Update sender's balance
             db.query('UPDATE users SET balance = ? WHERE email = ?', [updatedSenderBalance, senderEmail], (error) => {
@@ -158,10 +166,16 @@ app.post('/transfer', (req, res) => {
                 // Update recipient's balance
                 db.query('UPDATE users SET balance = ? WHERE ssn = ?', [updatedRecipientBalance, recipientGovID], (error) => {
                     if (error) {
+                        console.error('Error updating recipient balance:', error);  // Check if this logs an error
                         return res.status(500).json({ message: 'Error updating recipient balance.' });
                     }
-
-                    res.json({ success: true, message: `Successfully transferred $${amount} to ${recipient.first_name} ${recipient.last_name}.` });
+                
+                    console.log('Recipient balance updated to:', updatedRecipientBalance);  // Log updated balance
+                    res.json({
+                        success: true,
+                        message: `Successfully transferred $${amount} to ${recipient.first_name} ${recipient.last_name}.`,
+                        updatedSenderBalance,
+                        updatedRecipientBalance });
                 });
             });
         });
