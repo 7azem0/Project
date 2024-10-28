@@ -2,7 +2,7 @@ document.getElementById("transferForm").addEventListener("submit", function(even
     event.preventDefault(); // Prevent the form from refreshing the page
 
     // Get the input values
-    const recipientGovID = document.getElementById("recipientGovID").value.trim();
+    const recipientGovID = document.getElementById("ssn").value.trim();
     const transferAmount = parseFloat(document.getElementById("transferAmount").value);
 
     // Validate inputs
@@ -23,8 +23,8 @@ function transferFunds(senderEmail, recipientGovID, amount) {
     // Create transfer object
     const transferData = {
         senderEmail,
-        recipientGovID,
-        amount // Use 'amount' to match the server schema
+        ssn: recipientGovID,
+        amount: transferAmount // Use 'amount' to match the server schema
     };
 
     // Send transfer data to the server

@@ -5,25 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Home</title>
     <style>
+        /* Reset some default styles */
         body {
+            margin: 0;
+            padding: 0;
             font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+            background-color: #e6ecf0; /* Light grey background */
             text-align: center;
-            padding-top: 50px;
         }
         .container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff; /* White background for the container */
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
             display: inline-block;
+            max-width: 400px;
+            margin-top: 50px;
         }
         h1 {
-            color: #333;
+            color: #113c55; /* Twitter blue */
+            font-size: 24px;
+            margin-bottom: 15px;
         }
         .balance {
-            font-size: 2em;
-            color: green;
+            font-size: 1.5em;
+            color: #28a745; /* Green color for balance */
+            margin: 10px 0;
+        }
+        button {
+            background-color: #1da1f2; /* Twitter blue */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0d8dd9; /* Darker blue on hover */
+        }
+        #logoutButton {
+            background-color: #ff4757; /* Red for logout */
+        }
+        #logoutButton:hover {
+            background-color: #ff6b81; /* Lighter red on hover */
         }
     </style>
 </head>
@@ -44,10 +71,10 @@
         }
 
         // Retrieve first name, last name, and email from localStorage
-        const firstName = localStorage.getItem('firstName') || 'Guest';
-        const lastName = localStorage.getItem('lastName') || '';
+        const firstName = localStorage.getItem('first_name') || 'Guest';
+        const lastName = localStorage.getItem('last_name') || '';
         const email = localStorage.getItem('email'); // Get the email to fetch balance from the server
-
+        
         // Fetch the user's balance from the server
         fetch('/getBalance', {
             method: 'POST',
@@ -79,8 +106,8 @@
         // Logout function
         document.getElementById('logoutButton').addEventListener('click', function () {
             // Clear all user-related data from localStorage
-            localStorage.removeItem('firstName');
-            localStorage.removeItem('lastName');
+            localStorage.removeItem('first_name');
+            localStorage.removeItem('last_name');
             localStorage.removeItem('email'); // Clear email on logout
 
             // Redirect to the login page

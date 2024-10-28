@@ -33,7 +33,7 @@ app.post('/register', (req, res) => {
     const newUser = req.body;
     console.log('New registration attempt:', newUser); // Log incoming registration data
 
-    const requiredFields = ['first_name', 'middel_name', 'last_name', 'email', 'phone', 'dob', 'address', 'ssn', 'password', 'account_type', 'security_question', 'security_answer'];
+    const requiredFields = ['first_name', 'middle_name', 'last_name', 'email', 'phone', 'dob', 'address', 'ssn', 'password', 'account_type', 'security_question', 'security_answer'];
     for (const field of requiredFields) {
         if (!newUser[field]) {
             return res.status(400).json({ message: `${field} is required.` });
@@ -62,6 +62,27 @@ app.post('/register', (req, res) => {
             console.log('User registered successfully:', newUser.email);
             res.status(200).json({ message: 'Registration successful!', success: true });
         });
+    });
+});
+
+// Get user balance route
+app.post('/getBalance', (req, res) => {
+    const { email } = req.body;
+
+    // Fetch user balance from the database
+    db.query('SELECT balance FROM users WHERE email = ?', [email], (error, results) => {
+        if (error) {
+            console.error('Database error:', error);
+            return res.status(500).json({ message: 'Database error' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        // Assuming there's only one user with the email
+        const user = results[0];
+        res.json({ success: true, balance: user.balance });
     });
 });
 
@@ -125,15 +146,16 @@ app.post('/transfer', (req, res) => {
             }
 
             // Perform the transaction
-            const updatedSenderBalance = sender.balance - amount;
-            const updatedRecipientBalance = recipient.balance + amount;
+            const updatedSenderBalance = Math.round((sender.balance - amount) * 100) / 100;
+            const updatedRecipientBalance = Math.round((recipient.balance + amount) * 100) / 100;
 
-            // Update balances in the database
+            // Update sender's balance
             db.query('UPDATE users SET balance = ? WHERE email = ?', [updatedSenderBalance, senderEmail], (error) => {
                 if (error) {
                     return res.status(500).json({ message: 'Error updating sender balance.' });
                 }
 
+                // Update recipient's balance
                 db.query('UPDATE users SET balance = ? WHERE ssn = ?', [updatedRecipientBalance, recipientGovID], (error) => {
                     if (error) {
                         return res.status(500).json({ message: 'Error updating recipient balance.' });
