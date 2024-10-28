@@ -1,17 +1,19 @@
 document.getElementById('registrationForm').addEventListener('submit', function(event) {
-    event.preventDefault();
+    event.preventDefault(); // Prevent the form from submitting immediately
 
     // Get form values
-    const firstName = document.getElementById('firstName').value.trim();
-    const lastName = document.getElementById('lastName').value.trim();
+    const first_name = document.getElementById('first_name').value.trim();
+    const middle_name = document.getElementById('middle_name').value.trim();
+    const last_name = document.getElementById('last_name').value.trim();
     const email = document.getElementById('email').value.trim();
     const phone = document.getElementById('phone').value.trim();
     const dob = document.getElementById('dob').value.trim();
     const address = document.getElementById('address').value.trim();
     const ssn = document.getElementById('ssn').value.trim();
     const password = document.getElementById('password').value.trim();
-    const securityQuestion = document.getElementById('securityQuestion').value;
-    const securityAnswer = document.getElementById('securityAnswer').value.trim();
+    const account_type = document.getElementById('account_type').value.trim();
+    const security_question = document.getElementById('security_question').value.trim();
+    const security_answer = document.getElementById('security_answer').value.trim();
 
     const message = document.getElementById('message');
     message.innerHTML = ''; // Clear previous messages
@@ -22,7 +24,7 @@ document.getElementById('registrationForm').addEventListener('submit', function(
     const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;  // Minimum 8 characters, at least 1 letter and 1 number
 
     // Form validation
-    if (!firstName || !lastName || !email || !phone || !dob || !address || !ssn || !password || !securityQuestion || !securityAnswer) {
+    if (!first_name || !last_name || !email || !phone || !dob || !address || !ssn || !password || !account_type || !security_question || !security_answer) {
         message.innerHTML = "All fields are required.";
         message.style.color = 'red';
         return;
@@ -51,18 +53,22 @@ document.getElementById('registrationForm').addEventListener('submit', function(
 
     // Create user object
     const userData = {
-        firstName,
-        lastName,
+        first_name,
+        middle_name,
+        last_name,
         email,
         phone,
         dob,
         address,
         ssn,
         password,
-        securityQuestion,
-        securityAnswer,
-        balance:1000
+        account_type,
+        security_question,
+        security_answer
     };
+
+    // Disable the submit button to prevent multiple submissions
+    const submitButton = document.getElementById('submitButton');
 
     // Send data to server
     fetch('/register', {
@@ -72,23 +78,31 @@ document.getElementById('registrationForm').addEventListener('submit', function(
         },
         body: JSON.stringify(userData)
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => {
+                throw new Error(err.message);
+            });
+        }
+        return response.json();
+    })
     .then(data => {
-        if (data.message) {
-            message.innerHTML = data.message;
-            message.style.color = data.success ? 'green' : 'red';
+        message.innerHTML = data.message;
+        message.style.color = data.success ? 'green' : 'red';
 
-            // If registration is successful, redirect to login page
-            if (data.success) {
-                setTimeout(() => {
-                    window.location.href = '/login.html';  
-                }, 2000);  // Delay to show success message before redirect
-            }
+        // If registration is successful, redirect to login page
+        if (data.success) {
+            setTimeout(() => {
+                window.location.href = '/login.html';  
+            }, 2000);  // Delay to show success message before redirect
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        message.innerHTML = "An error occurred. Please try again.";
+        message.innerHTML = error.message || "An error occurred. Please try again.";
         message.style.color = 'red';
+    })
+    .finally(() => {
+        // Re-enable the submit button
     });
 });

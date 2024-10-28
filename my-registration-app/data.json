@@ -12,6 +12,19 @@
       "securityQuestion": "q2",
       "securityAnswer": "Mohamed sayed",
       "balance": 1000
+    },
+    {
+      "firstName": "Mohamed",
+      "lastName": "Kamel",
+      "email": "Mohamed@gmail.com",
+      "phone": "2222222222",
+      "dob": "2024-10-07",
+      "address": "uhh",
+      "ssn": "2023030097",
+      "password": "P12345678",
+      "securityQuestion": "q2",
+      "securityAnswer": "Mohamed sayed",
+      "balance": 1000
     }
   ]
 }

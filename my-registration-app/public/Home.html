@@ -32,9 +32,8 @@
         <h1 id="welcomeMessage">Welcome to your account</h1>
         <p>Your current balance is:</p>
         <p class="balance" id="balance">Loading...</p>
-        <button id="logoutButton">Logout</button> <!-- Logout Button -->
+        <button id="logoutButton">Logout</button>
         <button class="transaction-button" onclick="goToTransaction()">Transfer Money</button>
-
     </div>
 
     <script>
@@ -44,27 +43,51 @@
             document.getElementById('balance').textContent = `$${balance}`;
         }
 
-        // Retrieve first name, last name, and balance from localStorage
+        // Retrieve first name, last name, and email from localStorage
         const firstName = localStorage.getItem('firstName') || 'Guest';
         const lastName = localStorage.getItem('lastName') || '';
-        const balance = localStorage.getItem('balance') || '0';
+        const email = localStorage.getItem('email'); // Get the email to fetch balance from the server
 
-        // Call the display function
-        displayHomePage(firstName, lastName, balance);
+        // Fetch the user's balance from the server
+        fetch('/getBalance', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email }) // Send email to get balance
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Call the display function with the balance fetched from the server
+                displayHomePage(firstName, lastName, data.balance);
+            } else {
+                displayHomePage(firstName, lastName, '0'); // Default balance in case of an error
+                console.error(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching balance:', error);
+            displayHomePage(firstName, lastName, '0'); // Default balance in case of an error
+        });
 
         // Logout function
         document.getElementById('logoutButton').addEventListener('click', function () {
-            // Clear first name, last name, and balance from localStorage
+            // Clear all user-related data from localStorage
             localStorage.removeItem('firstName');
             localStorage.removeItem('lastName');
-            localStorage.removeItem('balance');
-
+            localStorage.removeItem('email'); // Clear email on logout
 
             // Redirect to the login page
             window.location.href = '/login.html'; // Change to your login page URL
-
-            
         });
+
+        // Redirect to the transaction page
         function goToTransaction() {
             window.location.href = 'Transaction.html'; // Redirect to transaction page
         }

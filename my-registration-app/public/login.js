@@ -1,51 +1,58 @@
-document.getElementById('loginForm').addEventListener('submit', function (event) {
-  event.preventDefault(); // Prevent form submission
+document.getElementById('loginForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent form submission
 
-  // Get the input values
-  const email = document.getElementById('loginEmail').value;
-  const password = document.getElementById('loginPassword').value;
+    // Get the input values
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
 
-  // Fetch the stored user data from data.json
-  fetch('/data.json')
-      .then(response => {
-          if (!response.ok) {
-              throw new Error('Network response was not ok ' + response.statusText);
-          }
-          return response.json();
-      })
-      .then(data => {
-          // Check if the email exists in the stored data
-          const user = data.users.find(user => user.email === email);
+    const messageElement = document.getElementById('loginMessage');
+    messageElement.innerHTML = ''; // Clear previous messages
 
-          if (user) {
-              // Compare the password
-              if (user.password === password) {
-                  const balance = 1000; // Default balance
-                  
-                          // Store the first and last name in localStorage
-                localStorage.setItem('firstName', user.firstName);
-                localStorage.setItem('lastName', user.lastName);
-                localStorage.setItem('balance', balance);
+    // Create login object
+    const loginData = {
+        email,
+        password
+    };
 
+    // Send login data to server
+    fetch('/login', { // Ensure this matches your server's login endpoint
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(loginData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => {
+                throw new Error(err.message);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Assuming the server sends back first name, last name, and balance
+            localStorage.setItem('first_name', data.user.first_name); // Updated to match schema
+            localStorage.setItem('last_name', data.user.last_name); // Updated to match schema
+            localStorage.setItem('balance', data.user.balance); // Assuming balance is part of the user object
+            localStorage.setItem('email', email); // Store user's email when they log in
 
-                  // Redirect to Home page
-                  window.location.href = '/home.html'; // Change to your home page URL
-              } else {
-                  displayMessage('Incorrect password. Please try again.', 'red');
-              }
-          } else {
-              displayMessage('User not found. Please register.', 'red');
-          }
-      })
-      .catch(error => {
-          displayMessage('Error fetching user data. Try again later.', 'red');
-          console.error('Error:', error);
-      });
+            // Redirect to Home page
+            window.location.href = '/home.html'; // Change to your home page URL
+        } else {
+            displayMessage(data.message, 'red');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        displayMessage(error.message || 'An error occurred. Please try again.', 'red');
+    });
 });
 
 // Function to display messages to the user
 function displayMessage(message, color) {
-  const messageElement = document.getElementById('loginMessage');
-  messageElement.textContent = message;
-  messageElement.style.color = color;
+    const messageElement = document.getElementById('loginMessage');
+    messageElement.textContent = message;
+    messageElement.style.color = color;
 }

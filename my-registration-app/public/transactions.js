@@ -1,46 +1,66 @@
+document.getElementById("transferForm").addEventListener("submit", function(event) {
+    event.preventDefault(); // Prevent the form from refreshing the page
+
+    // Get the input values
+    const recipientGovID = document.getElementById("recipientGovID").value.trim();
+    const transferAmount = parseFloat(document.getElementById("transferAmount").value);
+
+    // Validate inputs
+    if (!recipientGovID || isNaN(transferAmount) || transferAmount <= 0) {
+        displayMessage("Please enter a valid recipient ID and transfer amount.", 'red');
+        return;
+    }
+
+    // Assuming the sender's email is stored in localStorage
+    const senderEmail = localStorage.getItem("email"); 
+
+    // Call the transferFunds function with the collected data
+    transferFunds(senderEmail, recipientGovID, transferAmount);
+});
+
+// Updated transferFunds function to communicate with the server
 function transferFunds(senderEmail, recipientGovID, amount) {
-    fetch('/data.json')
-        .then(response => response.json())
-        .then(data => {
-            const users = data.users;
+    // Create transfer object
+    const transferData = {
+        senderEmail,
+        recipientGovID,
+        amount // Use 'amount' to match the server schema
+    };
 
-            // Debug logs
-            console.log('Users:', users);
-            console.log('Sender Email:', senderEmail);
-            console.log('Recipient Government ID:', recipientGovID);
+    // Send transfer data to the server
+    fetch('/transfer', { // Ensure this matches your server's transfer endpoint
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(transferData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => {
+                throw new Error(err.message);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Display the message from the server response
+        displayMessage(data.message, data.success ? 'green' : 'red');
+        
+        if (data.success) {
+            // Optionally reset the form or perform any other actions on success
+            document.getElementById("transferForm").reset();
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        displayMessage("Transaction failed. Please try again later.", 'red');
+    });
+}
 
-            // Find the sender and recipient by email and government ID
-            const sender = users.find(user => user.email.toLowerCase() === senderEmail.toLowerCase());
-            const recipient = users.find(user => user.ssn === recipientGovID);
-
-            // Check if sender and recipient exist
-            if (!sender) {
-                displayMessage("Sender not found.", 'red');
-                return;
-            }
-            if (!recipient) {
-                displayMessage("Recipient not found.", 'red');
-                return;
-            }
-
-            // Check if sender has enough balance
-            if (sender.balance < amount) {
-                displayMessage("Insufficient balance.", 'red');
-                return;
-            }
-
-            // Perform the transaction
-            sender.balance -= amount; // Subtract from sender
-            recipient.balance += amount; // Add to recipient
-
-            // Display success message
-            displayMessage(`Successfully transferred $${amount} to ${recipient.firstName} ${recipient.lastName}.`, 'green');
-
-            // Update the data in the data.json (or save to the database in a real app)
-            updateUserData(users); // Update users in the data file or database
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            displayMessage("Transaction failed. Please try again later.", 'red');
-        });
+// Display message function
+function displayMessage(message, color) {
+    const messageElement = document.getElementById("transactionMessage");
+    messageElement.textContent = message;
+    messageElement.style.color = color;
 }
