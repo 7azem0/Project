@@ -1,3 +1,4 @@
+// Registration form submission event listener
 document.getElementById('registrationForm').addEventListener('submit', function(event) {
     event.preventDefault(); // Prevent the form from submitting immediately
 
@@ -69,6 +70,7 @@ document.getElementById('registrationForm').addEventListener('submit', function(
 
     // Disable the submit button to prevent multiple submissions
     const submitButton = document.getElementById('submitButton');
+    submitButton.disabled = true;
 
     // Send data to server
     fetch('/register', {
@@ -104,5 +106,68 @@ document.getElementById('registrationForm').addEventListener('submit', function(
     })
     .finally(() => {
         // Re-enable the submit button
+        submitButton.disabled = false;
     });
 });
+
+// Function to fetch transaction history for the user
+function fetchTransactionHistory() {
+    const email = localStorage.getItem('email'); // Get the user's email from localStorage
+
+    fetch(`/transactions/history?email=${email}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch transaction history.');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const tableBody = document.querySelector('#transactionHistoryTable tbody');
+            tableBody.innerHTML = ''; // Clear previous entries
+
+            if (data.transactions.length > 0) {
+                data.transactions.forEach(transaction => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${transaction.id}</td>
+                        <td>${transaction.amount}</td>
+                        <td>${transaction.sender_email}</td>
+                        <td>${transaction.recipient_ssn}</td>
+                        <td>${transaction.status}</td>
+                        <td>${new Date(transaction.date).toLocaleString()}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } else {
+                tableBody.innerHTML = '<tr><td colspan="6">No transaction history found.</td></tr>';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching transaction history:', error);
+            displayMessage('Error fetching transaction history. Please try again later.', 'red');
+        });
+}
+
+// Function to display messages to the user
+function displayMessage(message, color) {
+    const messageContainer = document.getElementById('messageContainer') || createMessageContainer();
+
+    const messageElement = document.createElement('div');
+    messageElement.textContent = message;
+    messageElement.style.color = color;
+    messageElement.style.margin = '10px 0';
+
+    messageContainer.appendChild(messageElement); // Append to the message container
+}
+
+// Function to create a message container
+function createMessageContainer() {
+    const container = document.createElement('div');
+    container.id = 'messageContainer';
+    container.style.position = 'fixed';
+    container.style.top = '10px';
+    container.style.right = '10px';
+    container.style.zIndex = '1000';
+    document.body.appendChild(container);
+    return container;
+}

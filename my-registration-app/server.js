@@ -237,81 +237,105 @@ app.patch('/transactions/:id', (req, res) => {
                     // Check if sender has enough balance
                     if (senderBalance < transactionAmount) {
                         console.error("Insufficient balance to approve this transaction.");
-                        console.log(`Sender's balance: $${senderBalance}, Transaction amount: $${transactionAmount}`);
+                        console.log(`Sender's balance: $${senderBalance.toFixed(2)}, Transaction amount: $${transactionAmount.toFixed(2)}`);
                         return res.status(400).json({ message: "Insufficient balance to approve this transaction." });
                     }
         
-                    // Log if it passes the balance check
-                    console.log("Balance check passed. Proceeding with the transaction.");
+                    // Update balances
+                    const updatedSenderBalance = senderBalance - transactionAmount;
+                    const updatedRecipientBalance = recipientBalance + transactionAmount;
         
-                    // Calculate updated balances
-                    const updatedSenderBalance = Math.round((senderBalance - transactionAmount) * 100) / 100;
-                    const updatedRecipientBalance = Math.round((recipientBalance + transactionAmount) * 100) / 100;
-        
-                    // Log updated balances for debugging
-                    console.log(`Updated sender balance: $${updatedSenderBalance.toFixed(2)} (type: ${typeof updatedSenderBalance})`);
-                    console.log(`Updated recipient balance: $${updatedRecipientBalance.toFixed(2)} (type: ${typeof updatedRecipientBalance})`);
-        
-                    // Check for NaN values before updating
-                    if (isNaN(updatedSenderBalance) || isNaN(updatedRecipientBalance)) {
-                        console.error('Invalid updated balances: Sender Balance:', updatedSenderBalance, 'Recipient Balance:', updatedRecipientBalance);
-                        return res.status(400).json({ message: 'Invalid updated balances. Please check the transaction details.' });
-                    }
-        
-                    // Update sender's balance
-                    db.query('UPDATE users SET balance = ? WHERE email = ?', [updatedSenderBalance, transaction.sender_email], (error) => {
+                    // Update the sender's and recipient's balances in the database
+                    db.query('UPDATE users SET balance = ? WHERE email = ?', [updatedSenderBalance, sender.email], (error) => {
                         if (error) {
                             console.error('Error updating sender balance:', error);
                             return res.status(500).json({ message: 'Error updating sender balance.' });
                         }
         
-                        // Update recipient's balance
-                        db.query('UPDATE users SET balance = ? WHERE ssn = ?', [updatedRecipientBalance, transaction.recipient_ssn], (error) => {
+                        db.query('UPDATE users SET balance = ? WHERE ssn = ?', [updatedRecipientBalance, recipient.ssn], (error) => {
                             if (error) {
                                 console.error('Error updating recipient balance:', error);
                                 return res.status(500).json({ message: 'Error updating recipient balance.' });
                             }
         
-                            // Update transaction status
-                            db.query('UPDATE transactions SET status = ? WHERE id = ?', ['approved', id], (error) => {
+                            // Update transaction status to 'approved'
+                            db.query('UPDATE transactions SET status = "approved" WHERE id = ?', [id], (error) => {
                                 if (error) {
                                     console.error('Error updating transaction status:', error);
                                     return res.status(500).json({ message: 'Error updating transaction status.' });
                                 }
         
-                                console.log(`Transaction approved: $${transaction.amount} transferred from ${sender.first_name} ${sender.last_name} to ${recipient.first_name} ${recipient.last_name}.`);
-                                res.json({
-                                    success: true,
-                                    message: `Transaction approved successfully. $${transaction.amount} transferred from ${sender.first_name} ${sender.last_name} to ${recipient.first_name} ${recipient.last_name}.`,
-                                });
+                                console.log('Transaction approved successfully:', transaction);
+                                return res.json({ success: true, message: 'Transaction approved successfully.' });
                             });
                         });
                     });
                 });
             });
-        }
-         else if (status === 'rejected') {
-            // Update transaction status to rejected
-            db.query('UPDATE transactions SET status = ? WHERE id = ?', ['rejected', id], (error) => {
+        } else if (status === 'rejected') {
+            // Update transaction status to 'rejected'
+            db.query('UPDATE transactions SET status = "rejected" WHERE id = ?', [id], (error) => {
                 if (error) {
                     console.error('Error updating transaction status:', error);
                     return res.status(500).json({ message: 'Error updating transaction status.' });
                 }
-
-                console.log('Transaction rejected successfully:', id);
-                res.json({ success: true, message: 'Transaction rejected successfully.' });
+                console.log('Transaction rejected successfully:', transaction);
+                return res.json({ success: true, message: 'Transaction rejected successfully.' });
             });
         } else {
-            return res.status(400).json({ message: 'Invalid action. Please specify "approve" or "reject."' });
+            return res.status(400).json({ message: 'Invalid status. Use "approved" or "rejected".' });
         }
     });
 });
 
-// Serve static files like the registration and login pages
+// Get user transaction history route
+// Get user transaction history route
+app.get('/transactionHistory', (req, res) => {
+    const { email } = req.query; // Use query parameter to get email
+
+    // Fetch user transaction history from the database
+    db.query('SELECT * FROM transactions WHERE sender_email = ? OR recipient_ssn = ?', [email, email], (error, results) => {
+        if (error) {
+            console.error('Database error:', error);
+            return res.status(500).json({ message: 'Database error' });
+        }
+
+        // Format the transaction dates
+        const formattedTransactions = results.map(transaction => {
+            // Log the transaction for debugging
+            console.log('Original transaction:', transaction);
+
+            // Check and format the date
+            let formattedDate = null;
+            if (transaction.date) {
+                // Attempt to parse the date
+                const dateObject = new Date(transaction.date);
+                if (!isNaN(dateObject.getTime())) {
+                    formattedDate = dateObject.toISOString(); // Valid date
+                } else {
+                    console.warn('Invalid date format for transaction:', transaction);
+                }
+            }
+
+            return {
+                ...transaction,
+                date: formattedDate // Assign the formatted date
+            };
+        });
+
+        console.log('Transaction history fetched for user:', email); // Debugging line
+        res.json({ success: true, transactions: formattedTransactions });
+        console.log('Raw transaction results:', results);
+
+    });
+});
+
+
+// Serve static files (if needed)
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
 });
