@@ -1,6 +1,6 @@
 // Registration form submission event listener
 document.getElementById('registrationForm').addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevent the form from submitting immediately
+    event.preventDefault(); // Prevent the default form submission
 
     // Get form values
     const first_name = document.getElementById('first_name').value.trim();
@@ -70,7 +70,6 @@ document.getElementById('registrationForm').addEventListener('submit', function(
 
     // Disable the submit button to prevent multiple submissions
     const submitButton = document.getElementById('submitButton');
-    submitButton.disabled = true;
 
     // Send data to server
     fetch('/register', {
@@ -83,13 +82,13 @@ document.getElementById('registrationForm').addEventListener('submit', function(
     .then(response => {
         if (!response.ok) {
             return response.json().then(err => {
-                throw new Error(err.message);
+                throw new Error(err.message || 'Registration failed.');
             });
         }
         return response.json();
     })
     .then(data => {
-        message.innerHTML = data.message;
+        message.innerHTML = data.message; // Show success message
         message.style.color = data.success ? 'green' : 'red';
 
         // If registration is successful, redirect to login page
@@ -104,10 +103,7 @@ document.getElementById('registrationForm').addEventListener('submit', function(
         message.innerHTML = error.message || "An error occurred. Please try again.";
         message.style.color = 'red';
     })
-    .finally(() => {
-        // Re-enable the submit button
-        submitButton.disabled = false;
-    });
+    
 });
 
 // Function to fetch transaction history for the user
