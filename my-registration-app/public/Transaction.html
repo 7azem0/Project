@@ -4,53 +4,117 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Transfer Funds</title>
-    <style>
-        /* Basic styling */
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+            <style>
+        /* General page styling */
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0; /* Match home page background */
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
             text-align: center;
-            padding: 50px 20px; /* Increased padding for a better layout */
+            padding: 60px 40px;
+            margin: 0;
         }
+
         .container {
             background-color: white;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            display: inline-block; /* Center the container */
+            padding: 40px; /* Increased padding inside the container */
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+            margin-top: 40px; /* Space between top of the page and form */
         }
+
         h1 {
+            font-size: 2rem;
+            margin-bottom: 20px; /* Space between title and form fields */
+            color: #2c3e50;
+        }
+
+        .form-group {
+            margin-bottom: 20px; /* Increased spacing between form fields */
+            text-align: left; /* Align labels to the left */
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
             color: #333;
         }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            margin-right: 10px;
-        }
+
         input {
-            padding: 10px; /* Increased padding for better UX */
-            width: 250px; /* Fixed width for input fields */
-            border: 1px solid #ccc; /* Added border */
-            border-radius: 3px; /* Rounded borders */
+            padding: 10px;
+            width: 100%; /* Make input fields full width */
+            max-width: 400px; /* Maximum width for better responsiveness */
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box; 
         }
+
         button {
-            padding: 10px 20px; /* Padding for buttons */
-            background-color: #007bff; /* Blue button color */
+            padding: 10px 20px;
+            background-color: #007bff;
             color: white;
             border: none;
-            border-radius: 3px;
+            border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s ease;
+            margin-top: 10px; 
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
         }
+
         button:hover {
-            background-color: #0056b3; /* Darker blue on hover */
+            background-color: #0056b3;
         }
+
         #transactionMessage {
             margin-top: 20px; /* Space between form and message */
             font-weight: bold;
+            color: green;
         }
-    </style>
+
+        /* Animation for displaying messages */
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        
+
+        .message {
+            animation: fadeIn 0.5s ease-in-out; /* Apply fadeIn animation */
+        }
+
+        
+        .back-button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px; /* Space between message and back button */
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+
+            </style>
 </head>
 <body>
     <div class="container">

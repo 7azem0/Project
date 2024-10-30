@@ -1,13 +1,17 @@
 document.getElementById("transferForm").addEventListener("submit", function(event) {
     event.preventDefault(); // Prevent the form from refreshing the page
 
-    // Get the input values
     const recipientGovID = document.getElementById("recipientGovID").value.trim();
-    const transferAmount = parseFloat(document.getElementById("transferAmount").value);
+    const transferAmount = parseFloat(document.getElementById("transferAmount").value.trim());
 
     // Validate inputs
-    if (!recipientGovID || isNaN(transferAmount) || transferAmount <= 0) {
-        displayMessage("Please enter a valid recipient ID and transfer amount.", 'red');
+    if (!recipientGovID || !/^[0-9]+$/.test(recipientGovID)) {
+        displayMessage("Please enter a valid recipient ID (only integers).", 'red');
+        return;
+    }
+
+    if (isNaN(transferAmount) || transferAmount <= 0) {
+        displayMessage("Please enter a valid transfer amount greater than zero.", 'red');
         return;
     }
 
@@ -40,14 +44,14 @@ document.getElementById("transferForm").addEventListener("submit", function(even
     .then(data => {
         displayMessage(data.message, data.success ? 'green' : 'red');
         if (data.success) {
-            // Optionally clear the form or redirect
             document.getElementById("transferForm").reset();
         }
     })
-    .catch(error => {
-        console.error('Error:', error);
-        displayMessage(error.message || 'An error occurred. Please try again.', 'red');
-    });
+    
+.catch(error => {
+    console.error('Transaction Error:', error); // Server log
+    displayMessage("Something went wrong. Please try again later.", 'red'); // User-friendly message
+});
 });
 
 // Display message function
@@ -55,7 +59,23 @@ function displayMessage(message, color) {
     const messageElement = document.getElementById("transactionMessage");
     messageElement.textContent = message;
     messageElement.style.color = color;
+
+    messageElement.classList.remove('message', 'shake');
+
+    void messageElement.offsetWidth; // This forces a reflow
+
+    messageElement.classList.add('message');
+
+    if (messageElement.textContent === message) {
+        messageElement.classList.add('shake');
+    }
+
+    setTimeout(() => {
+        messageElement.classList.remove('shake');
+    }, 500); // Duration should match the shake animation duration
 }
+
+
 
 document.getElementById("homeButton").addEventListener("click", function() {
     window.location.href = "home.html"; // Replace with the actual path to your home page
