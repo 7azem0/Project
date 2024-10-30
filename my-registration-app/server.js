@@ -33,7 +33,9 @@ app.post('/register', (req, res) => {
     const newUser = req.body;
     console.log('New registration attempt:', newUser); // Log incoming registration data
 
-    const requiredFields = ['first_name', 'middle_name', 'last_name', 'email', 'phone', 'dob', 'address', 'ssn', 'password', 'account_type', 'security_question', 'security_answer'];
+    const requiredFields = ['first_name', 'last_name', 'email', 'phone', 'dob', 'address', 'ssn', 'password', 'account_type', 'security_question', 'security_answer'];
+    
+    // Check for required fields
     for (const field of requiredFields) {
         if (!newUser[field]) {
             return res.status(400).json({ message: `${field} is required.` });
@@ -64,6 +66,7 @@ app.post('/register', (req, res) => {
         });
     });
 });
+
 
 // Get user balance route
 app.post('/getBalance', (req, res) => {
