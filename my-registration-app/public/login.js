@@ -2,7 +2,7 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
     event.preventDefault(); // Prevent form submission
 
     // Get the input values
-    const email = document.getElementById('loginEmail').value;
+    const email = document.getElementById('loginEmail').value.trim();
     const password = document.getElementById('loginPassword').value;
 
     const messageElement = document.getElementById('loginMessage');
@@ -38,8 +38,14 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
             localStorage.setItem('balance', data.user.balance); // Assuming balance is part of the user object
             localStorage.setItem('email', email); // Store user's email when they log in
 
-            // Redirect to Home page
-            window.location.href = '/home.html'; // Change to your home page URL
+            // Redirect based on user type
+            if (email === "Admin@gmail.com") {
+                // Open admin page in a new tab
+                window.open("admin.html", "_blank");
+            } else {
+                // Redirect to Home page
+                window.location.href = '/home.html'; // Change to your home page URL
+            }
         } else {
             displayMessage(data.message, 'red');
         }
@@ -50,9 +56,30 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
     });
 });
 
-// Function to display messages to the user
+// Function to display messages to the user with animation
 function displayMessage(message, color) {
     const messageElement = document.getElementById('loginMessage');
     messageElement.textContent = message;
     messageElement.style.color = color;
+
+    // Animation effect for message display
+    messageElement.classList.add('slide-in');
+    setTimeout(() => {
+        messageElement.classList.remove('slide-in');
+    }, 3000); // Keep the message for 3 seconds
 }
+
+// CSS Animation for message (to be added in your CSS file)
+document.addEventListener("DOMContentLoaded", function() {
+    const style = document.createElement('style');
+    style.innerHTML = `
+        #loginMessage {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        #loginMessage.slide-in {
+            opacity: 1;
+        }
+    `;
+    document.head.appendChild(style);
+});

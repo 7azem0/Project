@@ -131,8 +131,6 @@ app.post('/transfer', (req, res) => {
 
         const sender = senderResults[0];
 
-        
-
         db.query('SELECT * FROM users WHERE ssn = ?', [recipientGovID], (error, recipientResults) => {
             if (error) {
                 return res.status(500).json({ message: 'Error fetching user data. Try again later.' });
@@ -146,39 +144,126 @@ app.post('/transfer', (req, res) => {
 
             console.log('Recipient initial balance:', recipient.balance);
 
-
             if (sender.balance < amount) {
                 return res.status(400).json({ success: false, message: "Insufficient balance." });
             }
 
-            // Perform the transaction
-            const updatedSenderBalance = Math.round((sender.balance - amount) * 100) / 100;
-            const updatedRecipientBalance = parseFloat(recipient.balance) + parseFloat(amount);
+            // Insert the transaction into the transactions table with a status of 'pending'
+            const transaction = {
+                sender_email: senderEmail,
+                recipient_ssn: recipientGovID,
+                amount: amount,
+                status: 'pending'
+            };
 
-
-
-            // Update sender's balance
-            db.query('UPDATE users SET balance = ? WHERE email = ?', [updatedSenderBalance, senderEmail], (error) => {
-                if (error) {
-                    return res.status(500).json({ message: 'Error updating sender balance.' });
+            db.query('INSERT INTO transactions SET ?', transaction, (insertError) => {
+                if (insertError) {
+                    console.error('Error inserting transaction:', insertError);
+                    return res.status(500).json({ message: 'Error processing transaction.' });
                 }
 
-                // Update recipient's balance
-                db.query('UPDATE users SET balance = ? WHERE ssn = ?', [updatedRecipientBalance, recipientGovID], (error) => {
-                    if (error) {
-                        console.error('Error updating recipient balance:', error);  // Check if this logs an error
-                        return res.status(500).json({ message: 'Error updating recipient balance.' });
-                    }
-                
-                    console.log('Recipient balance updated to:', updatedRecipientBalance);  // Log updated balance
-                    res.json({
-                        success: true,
-                        message: `Successfully transferred $${amount} to ${recipient.first_name} ${recipient.last_name}.`,
-                        updatedSenderBalance,
-                        updatedRecipientBalance });
+                console.log('Transaction created successfully:', transaction);
+                res.json({
+                    success: true,
+                    message: `Transaction of $${amount} to ${recipient.first_name} ${recipient.last_name} is pending approval.`,
                 });
             });
         });
+    });
+});
+
+// Admin route to get all transactions
+app.get('/transactions', (req, res) => {
+    db.query('SELECT * FROM transactions', (error, results) => {
+        if (error) {
+            console.error('Error fetching transactions:', error);
+            return res.status(500).json({ message: 'Database error' });
+        }
+        
+        console.log('Transactions fetched:', results); // Debugging line
+
+        res.json({ success: true, transactions: results });
+    });
+});
+
+
+app.patch('/transactions/:id', (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body; // Status can be 'approved' or 'rejected'
+
+    db.query('SELECT * FROM transactions WHERE id = ?', [id], (error, results) => {
+        if (error) {
+            console.error('Error fetching transaction:', error);
+            return res.status(500).json({ message: 'Database error' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'Transaction not found.' });
+        }
+
+        const transaction = results[0];
+
+        if (status === 'approved') {
+            // Logic for approving the transaction
+            db.query('SELECT * FROM users WHERE email = ?', [transaction.sender_email], (error, senderResults) => {
+                if (error) {
+                    return res.status(500).json({ message: 'Error fetching sender data.' });
+                }
+
+                const sender = senderResults[0];
+
+                db.query('SELECT * FROM users WHERE ssn = ?', [transaction.recipient_ssn], (error, recipientResults) => {
+                    if (error) {
+                        return res.status(500).json({ message: 'Error fetching recipient data.' });
+                    }
+
+                    const recipient = recipientResults[0];
+
+                    if (sender.balance < transaction.amount) {
+                        return res.status(400).json({ message: "Insufficient balance to approve this transaction." });
+                    }
+
+                    // Update sender's and recipient's balance
+                    const updatedSenderBalance = Math.round((sender.balance - transaction.amount) * 100) / 100;
+                    const updatedRecipientBalance = parseFloat(recipient.balance) + parseFloat(transaction.amount);
+
+                    db.query('UPDATE users SET balance = ? WHERE email = ?', [updatedSenderBalance, transaction.sender_email], (error) => {
+                        if (error) {
+                            return res.status(500).json({ message: 'Error updating sender balance.' });
+                        }
+
+                        db.query('UPDATE users SET balance = ? WHERE ssn = ?', [updatedRecipientBalance, transaction.recipient_ssn], (error) => {
+                            if (error) {
+                                return res.status(500).json({ message: 'Error updating recipient balance.' });
+                            }
+
+                            // Update transaction status
+                            db.query('UPDATE transactions SET status = ? WHERE id = ?', ['approved', id], (error) => {
+                                if (error) {
+                                    return res.status(500).json({ message: 'Error updating transaction status.' });
+                                }
+
+                                res.json({
+                                    success: true,
+                                    message: `Transaction approved successfully. $${transaction.amount} transferred from ${sender.first_name} ${sender.last_name} to ${recipient.first_name} ${recipient.last_name}.`,
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        } else if (status === 'rejected') {
+            // Update transaction status to rejected
+            db.query('UPDATE transactions SET status = ? WHERE id = ?', ['rejected', id], (error) => {
+                if (error) {
+                    return res.status(500).json({ message: 'Error updating transaction status.' });
+                }
+
+                res.json({ success: true, message: 'Transaction rejected successfully.' });
+            });
+        } else {
+            res.status(400).json({ message: 'Invalid action. Please specify "approve" or "reject."' });
+        }
     });
 });
 
