@@ -13,8 +13,12 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(data => {
                 const tableBody = document.querySelector('#transactionsTable tbody');
                 tableBody.innerHTML = ''; // Clear previous entries
-                if (data.transactions && data.transactions.length > 0) {
-                    data.transactions.forEach(transaction => {
+
+                // Filter for only pending transactions
+                const pendingTransactions = data.transactions.filter(transaction => transaction.status === 'pending');
+
+                if (pendingTransactions.length > 0) {
+                    pendingTransactions.forEach(transaction => {
                         const row = document.createElement('tr');
                         row.id = `transaction-${transaction.id}`; // Set ID for the row for later reference
                         row.innerHTML = `
@@ -23,14 +27,14 @@ document.addEventListener("DOMContentLoaded", function () {
                             <td>${transaction.amount}</td>
                             <td>${transaction.status}</td>
                             <td>
-                                <button onclick="judgeTransaction('${transaction.id}', 'approved')">Approve</button>
-                                <button onclick="judgeTransaction('${transaction.id}', 'rejected')">Reject</button>
+                                <button onclick="approveTransaction('${transaction.id}')">Approve</button>
+                                <button onclick="rejectTransaction('${transaction.id}')">Reject</button>
                             </td>
                         `;
                         tableBody.appendChild(row);
                     });
                 } else {
-                    tableBody.innerHTML = '<tr><td colspan="5">No transactions found.</td></tr>';
+                    tableBody.innerHTML = '<tr><td colspan="5">No pending transactions found.</td></tr>';
                 }
             })
             .catch(error => {
@@ -39,13 +43,12 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }
 
-    window.judgeTransaction = function (transactionId, status) {
-        // Disable buttons to prevent multiple clicks
-        const buttons = document.querySelectorAll(`#transaction-${transactionId} button`);
-        buttons.forEach(button => button.disabled = true); // Disable both buttons
-        
-        // Proceed to update the transaction status
-        updateTransactionStatus(transactionId, status);
+    window.approveTransaction = function (transactionId) {
+        updateTransactionStatus(transactionId, 'approved');
+    };
+
+    window.rejectTransaction = function (transactionId) {
+        updateTransactionStatus(transactionId, 'rejected');
     };
 
     function updateTransactionStatus(transactionId, status) {
@@ -56,23 +59,28 @@ document.addEventListener("DOMContentLoaded", function () {
             },
             body: JSON.stringify({ status })
         })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Failed to update transaction status.');
-                }
-                return response.json();
-            })
-            .then(data => {
-                alert(data.message);
-                moveToLogs(transactionId, status); // Move transaction to logs
-                fetchTransactions(); // Refresh the transaction table after the update
-            })
-            .catch(error => {
-                console.error('Error updating transaction status:', error);
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(error => { throw new Error(error.message); });
+            }
+            return response.json();
+        })
+        .then(data => {
+            alert(data.message);
+            moveToLogs(transactionId, status);  // Move transaction to logs
+            fetchTransactions(); // Refresh the transaction table after the update
+        })
+        .catch(error => {
+            console.error('Error updating transaction status:', error);
+            
+            // Display specific error message if balance is insufficient
+            if (error.message.includes("Insufficient balance")) {
+                displayMessage("Transaction cannot be approved: " + error.message, 'red');
+            } else {
                 displayMessage('Error updating transaction status. Please try again later.', 'red');
-            });
+            }
+        });
     }
-
     // Function to move the transaction to logs
     function moveToLogs(transactionId, status) {
         const row = document.getElementById(`transaction-${transactionId}`);
