@@ -66,21 +66,26 @@ document.addEventListener("DOMContentLoaded", function () {
             return response.json();
         })
         .then(data => {
-            alert(data.message);
+            const message = status === 'approved' 
+                ? `Transaction ID: ${transactionId} approved successfully!`
+                : `Transaction ID: ${transactionId} rejected successfully!`;
+                
+            displayMessage(message, 'green'); // Show success message
             moveToLogs(transactionId, status);  // Move transaction to logs
             fetchTransactions(); // Refresh the transaction table after the update
         })
         .catch(error => {
             console.error('Error updating transaction status:', error);
             
-            // Display specific error message if balance is insufficient
-            if (error.message.includes("Insufficient balance")) {
-                displayMessage("Transaction cannot be approved: " + error.message, 'red');
-            } else {
-                displayMessage('Error updating transaction status. Please try again later.', 'red');
-            }
+            // Improved error handling
+            const message = error.message.includes("Insufficient balance")
+                ? "Transaction cannot be approved: " + error.message
+                : "Error updating transaction status. Please check your network and try again.";
+            
+            displayMessage(message, 'red');
         });
     }
+
     // Function to move the transaction to logs
     function moveToLogs(transactionId, status) {
         const row = document.getElementById(`transaction-${transactionId}`);
@@ -100,20 +105,54 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             // Fade out the row before removing it
-            row.classList.add('fade-out');
-            setTimeout(() => {
-                row.remove(); // Remove the row from the table
-            }, 1000); // Time to wait before removing (should match the CSS transition time)
+            function fadeOutRow(row, status) {
+                row.classList.add('fade-out');
+                if (status === 'approved') {
+                    row.style.backgroundColor = '#d4edda'; // Light green for approved
+                } else {
+                    row.style.backgroundColor = '#f8d7da'; // Light red for rejected
+                }
+                setTimeout(() => {
+                    row.remove();
+                }, 1000);
+            }
+            
+            // Call this function in moveToLogs
+            fadeOutRow(row, status);
         }
     }
 
     // Function to display messages to the admin
     function displayMessage(message, color) {
+        const messageContainer = document.getElementById('messageContainer') || createMessageContainer();
+        
         const messageElement = document.createElement('div');
         messageElement.textContent = message;
         messageElement.style.color = color;
         messageElement.style.margin = '10px 0';
-        document.body.prepend(messageElement); // Add to the top of the body
-        setTimeout(() => messageElement.remove(), 3000); // Remove message after 3 seconds
+        
+        messageContainer.appendChild(messageElement); // Append to the message container
+        
+        // Show the message container
+        messageContainer.style.display = 'block';
+
+        // Automatically hide the message after a few seconds
+        setTimeout(() => {
+            messageElement.remove(); // Remove the message element after timeout
+            if (messageContainer.children.length === 0) {
+                messageContainer.style.display = 'none'; // Hide container if empty
+            }
+        }, 3000); // Adjust the timeout duration as needed
+    }
+    
+    function createMessageContainer() {
+        const container = document.createElement('div');
+        container.id = 'messageContainer';
+        container.style.position = 'fixed';
+        container.style.top = '10px';
+        container.style.right = '10px';
+        container.style.zIndex = '1000';
+        document.body.appendChild(container);
+        return container;
     }
 });
