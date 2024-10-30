@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Home</title>
     <style>
-       body {
+        body {
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
@@ -200,7 +200,7 @@
         })
         .then(response => {
             if (!response.ok) {
-                throw new Error('Network response was not ok ' + response.statusText);
+                throw new Error(`Failed to fetch balance: ${response.status} - ${response.statusText}`);
             }
             return response.json();
         })
@@ -214,7 +214,7 @@
             }
         })
         .catch(error => {
-            console.error('Error fetching balance:', error);
+            displayMessage(`Error fetching balance: ${error.message}`, 'red');
             displayHomePage(firstName, lastName, '0'); // Default balance in case of an error
         });
 
@@ -234,7 +234,7 @@
             window.location.href = 'transaction.html'; // Redirect to transaction page
         }
 
-        // Fetch transaction history
+       // Fetch transaction history
         function fetchTransactionHistory() {
             fetch(`/transactionHistory?email=${email}`)
                 .then(response => {
@@ -245,71 +245,83 @@
                 })
                 .then(data => {
                     transactions = data.transactions || []; // Store transactions globally
+                    // Sort transactions by date (newest first)
+                    transactions.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                     renderTable(transactions, currentPage); // Initial render
                 })
                 .catch(error => {
-                    console.error('Error fetching transaction history:', error);
-                    displayMessage('Error fetching transaction history. Please try again later.', 'red');
+                    console.error(error);
+                    displayMessage(`Error fetching transaction history: ${error.message}`, 'red');
                 });
         }
 
-        // Render transaction table for current page
+        // Render table based on current page
         function renderTable(transactions, page) {
             const start = (page - 1) * rowsPerPage;
             const end = start + rowsPerPage;
             const paginatedTransactions = transactions.slice(start, end);
 
-            // Function to format the date
-            function formatDate(dateString) {
-                const date = new Date(dateString);
-                // Check if the date is valid
-                if (!isNaN(date.getTime())) {
-                    return date.toLocaleString(); // Valid date, format it
-                }
-                return 'N/A'; // Invalid date
-            }
+            const tableBody = document.querySelector("#transactionHistoryTable tbody");
+            tableBody.innerHTML = ""; // Clear previous content
 
-            const tableBody = document.querySelector('#transactionHistoryTable tbody');
-            tableBody.innerHTML = ''; // Clear previous rows
+            paginatedTransactions.forEach(transaction => {
+                const row = createRow(transaction); // Create row using the helper function
+                tableBody.appendChild(row);
+            });
 
-            if (paginatedTransactions.length > 0) {
-                paginatedTransactions.forEach(transaction => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${transaction.id}</td>
-                        <td>${transaction.amount}</td>
-                        <td>${transaction.sender_email}</td>
-                        <td>${transaction.recipient_ssn}</td>
-                        <td>${transaction.status}</td>
-                        <td>${formatDate(transaction.created_at)}</td> <!-- Use created_at here -->
-                    `;
-                    tableBody.appendChild(row);
-                });
-            } else {
-                tableBody.innerHTML = '<tr><td colspan="6">No transaction history found.</td></tr>';
-            }
-
-            updatePagination(transactions.length, page);
+            renderPagination(transactions.length);
         }
 
-        // Update pagination buttons
-        function updatePagination(totalTransactions, page) {
-            const pagination = document.getElementById('pagination');
-            pagination.innerHTML = ''; // Clear existing buttons
+        // Create table row
+        const createRow = (transaction) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${transaction.id}</td>
+                <td>${transaction.amount}</td>
+                <td>${transaction.sender_email}</td>
+                <td>${transaction.recipient_ssn}</td>
+                <td>${transaction.status}</td>
+                <td>${formatDate(transaction.created_at)}</td>
+            `;
+            return row; // Return the created row
+        };
+
+        // Format date function
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            if (date.getTime() === 0) {
+                return 'N/A'; // Handle epoch time specifically
+            }
+            return date.toLocaleString('en-US', { timeZone: 'UTC' }); // Format date with specific locale and timezone
+        }
+
+        // Render pagination controls
+        function renderPagination(totalTransactions) {
+            const pagination = document.getElementById("pagination");
             const totalPages = Math.ceil(totalTransactions / rowsPerPage);
+            pagination.innerHTML = ""; // Clear previous pagination
 
             for (let i = 1; i <= totalPages; i++) {
-                const button = document.createElement('button');
-                button.textContent = i;
-                if (i === page) {
-                    button.classList.add('active');
-                }
+                const button = document.createElement("button");
+                button.innerText = i;
+                button.className = (i === currentPage) ? 'active' : ''; // Highlight active page
                 button.addEventListener('click', () => {
-                    currentPage = i;
-                    renderTable(transactions, i);
+                    currentPage = i; // Update current page
+                    renderTable(transactions, currentPage); // Re-render the table
                 });
-                pagination.appendChild(button);
+                pagination.appendChild(button); // Append button to pagination
             }
+        }
+
+        // Display message function
+        function displayMessage(message, color) {
+            const messageBox = document.createElement('div');
+            messageBox.innerText = message;
+            messageBox.style.color = color;
+            document.body.prepend(messageBox); // Show message at the top of the page
+            setTimeout(() => {
+                messageBox.remove(); // Remove message after 5 seconds
+            }, 5000);
         }
     </script>
 </body>
